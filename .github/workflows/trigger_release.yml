@@ -31,11 +31,6 @@ jobs:
     outputs:
       upload_url: ${{ steps.create_release.outputs.upload_url }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          submodules: "true"
-          path: "FjordLauncher-source"
       - name: Download artifacts
         uses: actions/download-artifact@v4
       - name: Grab and store version
@@ -44,15 +39,9 @@ jobs:
           echo "VERSION=$tag_name" >> $GITHUB_ENV
       - name: Package artifacts properly
         run: |
-          mv ${{ github.workspace }}/FjordLauncher-source FjordLauncher-${{ env.VERSION }}
           mv FjordLauncher-Linux-Qt6-Portable*/FjordLauncher-portable.tar.gz FjordLauncher-Linux-Qt6-Portable-${{ env.VERSION }}.tar.gz
-          mv FjordLauncher-Linux-Qt5-Portable*/FjordLauncher-portable.tar.gz FjordLauncher-Linux-Qt5-Portable-${{ env.VERSION }}.tar.gz
           mv FjordLauncher-*.AppImage/FjordLauncher-*.AppImage FjordLauncher-Linux-x86_64.AppImage
           mv FjordLauncher-*.AppImage.zsync/FjordLauncher-*.AppImage.zsync FjordLauncher-Linux-x86_64.AppImage.zsync
-          mv FjordLauncher-macOS-Legacy*/FjordLauncher.zip FjordLauncher-macOS-Legacy-${{ env.VERSION }}.zip
-          mv FjordLauncher-macOS*/FjordLauncher.zip FjordLauncher-macOS-${{ env.VERSION }}.zip
-
-          tar --exclude='.git' -czf FjordLauncher-${{ env.VERSION }}.tar.gz FjordLauncher-${{ env.VERSION }}
 
           for d in FjordLauncher-Windows-MSVC*; do
             cd "${d}" || continue
@@ -69,17 +58,6 @@ jobs:
             cd ..
           done
 
-          for d in FjordLauncher-Windows-MinGW-w64*; do
-            cd "${d}" || continue
-            INST="$(echo -n ${d} | grep -o Setup || true)"
-            PORT="$(echo -n ${d} | grep -o Portable || true)"
-            NAME="FjordLauncher-Windows-MinGW-w64"
-            test -z "${PORT}" || NAME="${NAME}-Portable"
-            test -z "${INST}" || mv FjordLauncher-*.exe ../${NAME}-Setup-${{ env.VERSION }}.exe
-            test -n "${INST}" || zip -r -9 "../${NAME}-${{ env.VERSION }}.zip" *
-            cd ..
-          done
-
       - name: Create release
         id: create_release
         uses: softprops/action-gh-release@v2
@@ -90,19 +68,7 @@ jobs:
           draft: true
           prerelease: false
           files: |
-            FjordLauncher-Linux-Qt5-Portable-${{ env.VERSION }}.tar.gz
             FjordLauncher-Linux-x86_64.AppImage
             FjordLauncher-Linux-x86_64.AppImage.zsync
             FjordLauncher-Linux-Qt6-Portable-${{ env.VERSION }}.tar.gz
-            FjordLauncher-Windows-MinGW-w64-${{ env.VERSION }}.zip
-            FjordLauncher-Windows-MinGW-w64-Portable-${{ env.VERSION }}.zip
-            FjordLauncher-Windows-MinGW-w64-Setup-${{ env.VERSION }}.exe
-            FjordLauncher-Windows-MSVC-arm64-${{ env.VERSION }}.zip
-            FjordLauncher-Windows-MSVC-arm64-Portable-${{ env.VERSION }}.zip
-            FjordLauncher-Windows-MSVC-arm64-Setup-${{ env.VERSION }}.exe
-            FjordLauncher-Windows-MSVC-${{ env.VERSION }}.zip
             FjordLauncher-Windows-MSVC-Portable-${{ env.VERSION }}.zip
-            FjordLauncher-Windows-MSVC-Setup-${{ env.VERSION }}.exe
-            FjordLauncher-macOS-${{ env.VERSION }}.zip
-            FjordLauncher-macOS-Legacy-${{ env.VERSION }}.zip
-            FjordLauncher-${{ env.VERSION }}.tar.gz

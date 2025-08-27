@@ -50,6 +50,7 @@ TexturePackFolderModel::TexturePackFolderModel(const QString& dir, BaseInstance*
     m_column_resize_modes = { QHeaderView::Interactive, QHeaderView::Interactive, QHeaderView::Stretch, QHeaderView::Interactive,
                               QHeaderView::Interactive };
     m_columnsHideable = { false, true, false, true, true };
+    m_columnsHiddenByDefault = { false, false, false, true, true };
 }
 
 Task* TexturePackFolderModel::createUpdateTask()
