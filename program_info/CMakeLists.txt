@@ -20,7 +20,7 @@ set(Launcher_Copyright "${Launcher_Copyright}" PARENT_SCOPE)
 set(Launcher_Domain "unmojang.org" PARENT_SCOPE)
 set(Launcher_UserAgent "${Launcher_CommonName}/${Launcher_VERSION_NAME}" PARENT_SCOPE)
 set(Launcher_ConfigFile "fjordlauncher.cfg" PARENT_SCOPE)
-set(Launcher_Git "https://github.com/unmojang/FjordLauncher" PARENT_SCOPE)
+set(Launcher_Git "https://github.com/aloki/FjordLauncher" PARENT_SCOPE)
 set(Launcher_DesktopFileName "org.unmojang.FjordLauncher.desktop" PARENT_SCOPE)
 set(Launcher_SVGFileName "org.unmojang.FjordLauncher.svg" PARENT_SCOPE)
 

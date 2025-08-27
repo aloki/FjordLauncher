@@ -71,10 +71,8 @@
 #include "ui/setupwizard/AutoJavaWizardPage.h"
 #include "ui/setupwizard/JavaWizardPage.h"
 #include "ui/setupwizard/LanguageWizardPage.h"
-#include "ui/setupwizard/LoginWizardPage.h"
 #include "ui/setupwizard/PasteWizardPage.h"
 #include "ui/setupwizard/SetupWizard.h"
-#include "ui/setupwizard/ThemeWizardPage.h"
 
 #include "ui/dialogs/CustomMessageBox.h"
 
@@ -700,7 +698,7 @@ Application::Application(int& argc, char** argv) : QApplication(argc, argv)
         m_settings->registerSetting("SkipModpackUpdatePrompt", false);
 
         // Missing authlib-injector behavior
-        m_settings->registerSetting("MissingAuthlibInjectorBehavior", MissingAuthlibInjectorBehavior::Ask);
+        m_settings->registerSetting("MissingAuthlibInjectorBehavior", MissingAuthlibInjectorBehavior::Install);
 
         // Minecraft offline player name
         m_settings->registerSetting("LastOfflinePlayerName", "");
@@ -796,7 +794,7 @@ Application::Application(int& argc, char** argv) : QApplication(argc, argv)
                 m_settings->set("FlameKeyOverride", flameKey);
             m_settings->reset("CFKeyOverride");
         }
-        m_settings->registerSetting("FlameKeyShouldBeFetchedOnStartup", true);
+        m_settings->registerSetting("FlameKeyShouldBeFetchedOnStartup", false);
         m_settings->registerSetting("ModrinthToken", "");
         m_settings->registerSetting("UserAgentOverride", "");
 
@@ -1117,24 +1115,20 @@ bool Application::createSetupWizard()
     bool pasteInterventionRequired = settings()->get("PastebinURL") != "";
     bool validWidgets = m_themeManager->isValidApplicationTheme(settings()->get("ApplicationTheme").toString());
     bool validIcons = m_themeManager->isValidIconTheme(settings()->get("IconTheme").toString());
-    bool login = !m_accounts->anyAccountIsValid() && capabilities() & Application::SupportsMSA;
-    bool themeInterventionRequired = !validWidgets || !validIcons;
-    bool wizardRequired = javaRequired || languageRequired || pasteInterventionRequired || themeInterventionRequired || askjava || login;
-    if (wizardRequired) {
-        // set default theme after going into theme wizard
-        if (!validIcons)
-            settings()->set("IconTheme", QString("pe_colored"));
-        if (!validWidgets) {
+    bool wizardRequired = javaRequired || languageRequired || pasteInterventionRequired || askjava;
+    if (!validIcons)
+        settings()->set("IconTheme", QString("pe_colored"));
+    if (!validWidgets) {
 #if defined(Q_OS_WIN32) && QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
-            const QString style =
-                QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark ? QStringLiteral("dark") : QStringLiteral("bright");
+        const QString style =
+            QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark ? QStringLiteral("dark") : QStringLiteral("bright");
 #else
-            const QString style = QStringLiteral("system");
+        const QString style = QStringLiteral("system");
 #endif
 
-            settings()->set("ApplicationTheme", style);
-        }
-
+        settings()->set("ApplicationTheme", style);
+    }
+    if (wizardRequired) {
         m_themeManager->applyCurrentlySelectedTheme(true);
 
         m_setupWizard = new SetupWizard(nullptr);
@@ -1151,19 +1145,11 @@ bool Application::createSetupWizard()
         if (pasteInterventionRequired) {
             m_setupWizard->addPage(new PasteWizardPage(m_setupWizard));
         }
-
-        if (themeInterventionRequired) {
-            m_setupWizard->addPage(new ThemeWizardPage(m_setupWizard));
-        }
-
-        if (login) {
-            m_setupWizard->addPage(new LoginWizardPage(m_setupWizard));
-        }
         connect(m_setupWizard, &QDialog::finished, this, &Application::setupWizardFinished);
         m_setupWizard->show();
     }
 
-    return wizardRequired || login;
+    return wizardRequired;
 }
 
 bool Application::updaterEnabled()
