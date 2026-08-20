@@ -445,7 +445,7 @@ void LaunchController::launchInstance()
             int behavior = APPLICATION->settings()->get("MissingYggdrasilAgentBehavior").toInt();
 
             if (behavior == (int)MissingYggdrasilAgentBehavior::InstallAuthlibInjector && !authlibSupported)
-                behavior = (int)MissingYggdrasilAgentBehavior::Ask;
+                behavior = (int)MissingYggdrasilAgentBehavior::InstallLoki;
 
             if (behavior == (int)MissingYggdrasilAgentBehavior::Ask) {
                 QMessageBox msgBox{ m_parentWidget };

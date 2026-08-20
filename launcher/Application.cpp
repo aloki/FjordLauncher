@@ -68,13 +68,8 @@
 #include "ui/pages/global/MinecraftPage.h"
 #include "ui/pages/global/ProxyPage.h"
 
-#include "ui/setupwizard/AutoJavaWizardPage.h"
-#include "ui/setupwizard/JavaWizardPage.h"
 #include "ui/setupwizard/LanguageWizardPage.h"
-#include "ui/setupwizard/LoginWizardPage.h"
-#include "ui/setupwizard/PasteWizardPage.h"
 #include "ui/setupwizard/SetupWizard.h"
-#include "ui/setupwizard/ThemeWizardPage.h"
 
 #include "ui/dialogs/CustomMessageBox.h"
 
@@ -789,7 +784,7 @@ Application::Application(int& argc, char** argv) : QApplication(argc, argv)
         m_settings->registerSetting("ShowModIncompat", false);
 
         // Missing Yggdrasil agent behavior
-        m_settings->registerSetting("MissingYggdrasilAgentBehavior", (int)MissingYggdrasilAgentBehavior::Ask);
+        m_settings->registerSetting("MissingYggdrasilAgentBehavior", (int)MissingYggdrasilAgentBehavior::InstallAuthlibInjector);
 
         // Yggdrasil agent options
         m_settings->registerSetting("YggdrasilAgentAutoUpdate", false);
@@ -907,7 +902,7 @@ Application::Application(int& argc, char** argv) : QApplication(argc, argv)
                 m_settings->set("FlameKeyOverride", flameKey);
             m_settings->reset("CFKeyOverride");
         }
-        m_settings->registerSetting("FlameKeyShouldBeFetchedOnStartup", true);
+        m_settings->registerSetting("FlameKeyShouldBeFetchedOnStartup", false);
         m_settings->registerSetting("FallbackMRBlockedMods", true);
         m_settings->registerSetting("ModrinthToken", "");
         m_settings->registerSetting("UserAgentOverride", "");
@@ -1244,9 +1239,8 @@ bool Application::createSetupWizard()
     bool pasteInterventionRequired = settings()->get("PastebinURL") != "";
     bool validWidgets = m_themeManager->isValidApplicationTheme(settings()->get("ApplicationTheme").toString());
     bool validIcons = m_themeManager->isValidIconTheme(settings()->get("IconTheme").toString());
-    bool login = !m_accounts->anyAccountIsValid() && capabilities() & Application::SupportsMSA;
     bool themeInterventionRequired = !validWidgets || !validIcons;
-    bool wizardRequired = javaRequired || languageRequired || pasteInterventionRequired || themeInterventionRequired || askjava || login;
+    bool wizardRequired = javaRequired || languageRequired || pasteInterventionRequired || themeInterventionRequired || askjava;
     if (wizardRequired) {
         // set default theme after going into theme wizard
         if (!validIcons)
@@ -1268,29 +1262,11 @@ bool Application::createSetupWizard()
         if (languageRequired) {
             m_setupWizard->addPage(new LanguageWizardPage(m_setupWizard));
         }
-
-        if (javaRequired) {
-            m_setupWizard->addPage(new JavaWizardPage(m_setupWizard));
-        } else if (askjava) {
-            m_setupWizard->addPage(new AutoJavaWizardPage(m_setupWizard));
-        }
-
-        if (pasteInterventionRequired) {
-            m_setupWizard->addPage(new PasteWizardPage(m_setupWizard));
-        }
-
-        if (themeInterventionRequired) {
-            m_setupWizard->addPage(new ThemeWizardPage(m_setupWizard));
-        }
-
-        if (login) {
-            m_setupWizard->addPage(new LoginWizardPage(m_setupWizard));
-        }
         connect(m_setupWizard, &QDialog::finished, this, &Application::setupWizardFinished);
         m_setupWizard->show();
     }
 
-    return wizardRequired || login;
+    return wizardRequired;
 }
 
 bool Application::updaterEnabled()
