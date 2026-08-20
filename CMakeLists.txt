@@ -157,7 +157,7 @@ if(ENABLE_LTO)
     endif()
 endif()
 
-option(BUILD_TESTING "Build the testing tree." ON)
+option(BUILD_TESTING "Build the testing tree." OFF)
 
 find_package(ECM NO_MODULE REQUIRED)
 set(CMAKE_MODULE_PATH "${ECM_MODULE_PATH};${CMAKE_MODULE_PATH}")
@@ -192,7 +192,7 @@ set(Launcher_VERSION_NAME4_COMMA "${Launcher_VERSION_MAJOR},${Launcher_VERSION_M
 set(Launcher_BUILD_PLATFORM "unknown" CACHE STRING "A short string identifying the platform that this build was built for. Only used to display in the about dialog.")
 
 # Github repo URL with releases for updater
-set(Launcher_UPDATER_GITHUB_REPO "https://github.com/unmojang/FjordLauncher" CACHE STRING "Base github URL for the updater.")
+set(Launcher_UPDATER_GITHUB_REPO "https://github.com/aloki/FjordLauncher" CACHE STRING "Base github URL for the updater.")
 
 # Name to help updater identify valid artifacts
 set(Launcher_BUILD_ARTIFACT "" CACHE STRING "Artifact name to help the updater identify valid artifacts.")
@@ -256,7 +256,7 @@ set(Launcher_MSA_CLIENT_ID "00000000441cc96b" CACHE STRING "Microsoft auth title
 # By using this key in your builds you accept the terms and conditions laid down in
 # https://support.curseforge.com/en/support/solutions/articles/9000207405-curse-forge-3rd-party-api-terms-and-conditions
 # NOTE: CurseForge requires you to change this if you make any kind of derivative work.
-set(Launcher_CURSEFORGE_API_KEY "" CACHE STRING "API key for the CurseForge platform")
+set(Launcher_CURSEFORGE_API_KEY "$2a$10$bL4bIL5pUWqfcO7KQtnMReakwtfHbNKh6v1uTpKlzhwoueEJQnPnm" CACHE STRING "API key for the CurseForge platform")
 
 set(Launcher_COMPILER_NAME ${CMAKE_CXX_COMPILER_ID})
 set(Launcher_COMPILER_VERSION ${CMAKE_CXX_COMPILER_VERSION})
